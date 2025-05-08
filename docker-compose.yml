@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17.4
+    container_name: copro-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: copro
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: copro-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@copro.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

@@ -1,0 +1,67 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Copropriete {
+  id              Int              @id @default(autoincrement())
+  nom             String
+  adresse         String?
+  ville           String?
+  codePostal      String?
+  lots            Lot[]
+  coproprietaires Coproprietaire[]
+}
+
+model Lot {
+  id            Int            @id @default(autoincrement())
+  numero        String
+  surface       Float?
+  coproprieteId Int
+  copropriete   Copropriete    @relation(fields: [coproprieteId], references: [id])
+  appartenances Appartenance[]
+}
+
+model Coproprietaire {
+  id            Int            @id @default(autoincrement())
+  nom           String
+  email         String?
+  telephone     String?
+  coproprieteId Int
+  copropriete   Copropriete    @relation(fields: [coproprieteId], references: [id])
+  appartenances Appartenance[]
+}
+
+model Appartenance {
+  id               Int   @id @default(autoincrement())
+  lotId            Int
+  coproprietaireId Int
+  pourcentage      Float
+
+  lot            Lot            @relation(fields: [lotId], references: [id])
+  coproprietaire Coproprietaire @relation(fields: [coproprietaireId], references: [id])
+
+  @@unique([lotId, coproprietaireId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(COPROPRIETAIRE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  COPROPRIETAIRE
+  MEMBRE_CONSEIL
+}
